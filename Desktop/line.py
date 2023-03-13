@@ -1,29 +1,46 @@
+import os
+import requests
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextSendMessage, ImageMessage, ImageSendMessage
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('62ZENjFkBcO5a2oDVeZikb8e1zBj7v3MgSSuR6JIYdqFEXHrp/1Riy6pq9eECx8oCfSMSHFTkLwSxKQNK9Mbiz0QXFcmiYwzC6aRFXfB8zdGEgak/3KUGRsXXG+zjvxHX7/870dygF8gKoLcPlW2zAdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('f41d464e3dd13a4874b06bd2a0db1851')
+# 設置Line Bot的Channel access token及Channel secret
+line_bot_api = LineBotApi('K7jkNovEJpCqafdqEuZh1TFGcr5JegkjJHC6l6v2+ZfLlNoByJUGgGnuY6yJ3dELGESLXwru742Ku2ijGgGtUHJ2150By86Wj6kzZKySFnmkyU4jHhK//pyfRoi4bU/VvGS/wKeOzBYP8NyV3q1CqQdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('2a9a171886e678889fc9972e25c3580c')
 
-@app.route("/callback", methods=['POST'])
-def callback():
+
+# Line Bot接收Webhook的路由
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    # 驗證Line Bot的簽名
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
+
     return 'OK'
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    text = event.message.text
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=text))
 
-if __name__ == "__main__":
+# 處理收到的圖片訊息
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image(event):
+    # 取得圖片網址
+    message_content = line_bot_api.get_message_content(event.message.id)
+
+    # 建立資料夾（如果不存在）
+    if not os.path.exists("images"):
+        os.makedirs("images")
+
+    # 儲存圖片檔案
+    with open(f"images/{event.message.id}.jpg", "wb") as f:
+        for chunk in message_content.iter_content():
+            f.write(chunk)
+
+
+if __name__ == '__main__':
     app.run()
