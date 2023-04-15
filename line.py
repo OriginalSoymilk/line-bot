@@ -13,11 +13,16 @@ handler = WebhookHandler('2a9a171886e678889fc9972e25c3580c')
 
 
 # Line Bot接收Webhook的路由
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    # 驗證Line Bot的簽名
+@app.route("/callback", methods=['POST'])
+def callback():
+    # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
+
+    # get request body as text
     body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+
+    # handle webhook body
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
@@ -25,21 +30,14 @@ def webhook():
 
     return 'OK'
 
-
-# 處理收到的圖片訊息
-@handler.add(MessageEvent, message=ImageMessage)
-def handle_image(event):
-    # 取得圖片網址
-    message_content = line_bot_api.get_message_content(event.message.id)
-
-    # 建立資料夾（如果不存在）
-    if not os.path.exists("images"):
-        os.makedirs("images")
-
-    # 儲存圖片檔案
-    with open(f"images/{event.message.id}.jpg", "wb") as f:
-        for chunk in message_content.iter_content():
-            f.write(chunk)
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    text = event.message.text
+    reply_text = 'Hello, you said: ' + text
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=reply_text)
+    )
 
 
 if __name__ == '__main__':
