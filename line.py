@@ -8,8 +8,8 @@ from linebot.models import MessageEvent, TextSendMessage, ImageMessage, ImageSen
 app = Flask(__name__)
 
 # 設置Line Bot的Channel access token及Channel secret
-line_bot_api = LineBotApi('K7jkNovEJpCqafdqEuZh1TFGcr5JegkjJHC6l6v2+ZfLlNoByJUGgGnuY6yJ3dELGESLXwru742Ku2ijGgGtUHJ2150By86Wj6kzZKySFnmkyU4jHhK//pyfRoi4bU/VvGS/wKeOzBYP8NyV3q1CqQdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('2a9a171886e678889fc9972e25c3580c')
+line_bot_api = LineBotApi('62ZENjFkBcO5a2oDVeZikb8e1zBj7v3MgSSuR6JIYdqFEXHrp/1Riy6pq9eECx8oCfSMSHFTkLwSxKQNK9Mbiz0QXFcmiYwzC6aRFXfB8zdGEgak/3KUGRsXXG+zjvxHX7/870dygF8gKoLcPlW2zAdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('f41d464e3dd13a4874b06bd2a0db1851')
 
 
 # Line Bot接收Webhook的路由
